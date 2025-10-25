@@ -1,0 +1,658 @@
+/* @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: url('img.jpg') no-repeat;
+    background-size: cover;
+    background-position: center;
+
+
+}
+.wrapper {
+    width: 420px;
+    background-color: transparent;
+    border: 2px solid rgba(255,255,255, .2);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0, .1);
+    color: #fff;
+    border-radius: 10px;
+    padding: 30px 40px;
+}
+
+.wrapper h1{
+    font-size: 36px;
+    text-align: center;
+
+}
+
+.wrapper .input-box{
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin: 25px 0;
+}
+.input-box input,
+.input-box select,
+.input-box textarea {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 2px solid rgba(255,255,255, .2);
+    border-radius: 40px;
+    font-size: 16px;
+    color: #333;
+    padding: 0 45px 0 20px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.input-box textarea {
+    height: 100px;
+    padding: 15px 20px;
+    border-radius: 20px;
+    resize: vertical;
+}
+
+.input-box i {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #333;
+}
+
+.input-box input::placeholder,
+.input-box textarea::placeholder {
+    color: #666;
+}
+
+.input-box input:focus,
+.input-box select:focus,
+.input-box textarea:focus {
+    border-color: #333;
+    background: rgba(255, 255, 255, 1);
+}
+
+.wrapper .remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14.5px;
+    margin: -15px 0 15px;
+
+}
+.remember-forgot label input {
+    accent-color: #fff;
+    margin-right: 3px;
+
+}
+.remember-forgot a{
+    color: #fff;
+    text-decoration: none;
+
+
+}
+.remember-forgot a:hover{
+    text-decoration: underline;
+
+}
+.wrapper .btn{
+    width: 100%;
+    height: 45px;
+    background: #fff;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0,0,0, .1);
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+
+
+}
+.wrapper .register-link{
+    font-size: 14.5px;
+    text-align: center;
+    margin: 20px 0 15px;
+
+}
+.register-link p a{
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+}
+.register-link p a:hover{
+    text-decoration: underline;
+
+}
+
+
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.container h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.add-password-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.add-password-form h2 {
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.passwords-list {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.passwords-list h2 {
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.password-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.password-item:last-child {
+    border-bottom: none;
+}
+
+.password-info {
+    flex: 1;
+}
+
+.password-info strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.password-info p {
+    margin: 0.25rem 0;
+    color: #666;
+}
+
+.delete-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.delete-btn:hover {
+    background: #cc0000;
+}
+
+#logoutBtn {
+    display: block;
+    margin: 2rem auto;
+    background: #666;
+}
+
+#logoutBtn:hover {
+    background: #444;
+}
+
+
+.password-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0 20px;
+    border-radius: 40px;
+    height: 50px;
+}
+
+.password-field i {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.password-field i:hover {
+    color: #333;
+}
+
+
+.search-filter {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-filter .input-box {
+    flex: 1;
+    margin: 0;
+}
+
+.search-filter select {
+    width: 200px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(255,255,255, .2);
+    border-radius: 40px;
+    font-size: 16px;
+    color: #333;
+    padding: 0 20px;
+    outline: none;
+}
+
+.search-filter select:focus {
+    border-color: #333;
+    background: rgba(255, 255, 255, 1);
+} */
+
+
+
+/* File: public/css/style.css */
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* background: url('img.jpg') no-repeat; */
+    background: url('/img.jpg') no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.wrapper {
+    width: 420px;
+    background-color: transparent;
+    border: 2px solid rgba(255,255,255, .2);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0, .1);
+    color: #fff;
+    border-radius: 10px;
+    padding: 30px 40px;
+}
+
+.wrapper h1{
+    font-size: 36px;
+    text-align: center;
+}
+
+.wrapper .input-box{
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin: 25px 0;
+}
+
+.input-box input,
+.input-box select,
+.input-box textarea {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 2px solid rgba(255,255,255, .2);
+    border-radius: 40px;
+    font-size: 16px;
+    color: #333;
+    padding: 0 45px 0 20px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.input-box textarea {
+    height: 100px;
+    padding: 15px 20px;
+    border-radius: 20px;
+    resize: vertical;
+}
+
+.input-box i {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #333;
+}
+
+.input-box input::placeholder,
+.input-box textarea::placeholder {
+    color: #666;
+}
+
+.input-box input:focus,
+.input-box select:focus,
+.input-box textarea:focus {
+    border-color: #333;
+    background: rgba(255, 255, 255, 1);
+}
+
+.wrapper .remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14.5px;
+    margin: -15px 0 15px;
+}
+
+.remember-forgot label input {
+    accent-color: #fff;
+    margin-right: 3px;
+}
+
+.remember-forgot a{
+    color: #fff;
+    text-decoration: none;
+}
+
+.remember-forgot a:hover{
+    text-decoration: underline;
+}
+
+.wrapper .btn{
+    width: 100%;
+    height: 45px;
+    background: #fff;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0,0,0, .1);
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+}
+
+.wrapper .register-link,
+.wrapper .login-link {
+    font-size: 14.5px;
+    text-align: center;
+    margin: 20px 0 15px;
+}
+
+.register-link p a,
+.login-link p a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.register-link p a:hover,
+.login-link p a:hover {
+    text-decoration: underline;
+}
+
+/* Main page styles */
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #fff;
+}
+
+.container h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #fff;
+}
+
+.add-password-form {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.add-password-form h2 {
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.passwords-list {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.passwords-list h2 {
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.password-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.password-item:last-child {
+    border-bottom: none;
+}
+
+.password-info {
+    flex: 1;
+    word-break: break-all;
+}
+
+.password-info strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.password-info p {
+    margin: 0.25rem 0;
+    color: #666;
+}
+
+.password-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.delete-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.delete-btn:hover {
+    background: #cc0000;
+}
+
+#logoutBtn {
+    display: block;
+    margin: 2rem auto;
+    width: 50%;
+}
+
+.password-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.password-field i {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #666;
+}
+.password-field i:hover { color: #333; }
+
+.password-strength {
+    height: 5px;
+    width: 100%;
+    background: #eee;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+.password-strength.strength-1 { background: #ff4444; }
+.password-strength.strength-2 { background: #ffbb33; }
+.password-strength.strength-3 { background: #ffff00; }
+.password-strength.strength-4 { background: #99cc00; }
+.password-strength.strength-5 { background: #00c851; }
+
+.password-options {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+/* Search and Filter Section */
+.search-filter {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.search-filter .input-box {
+    flex: 1;
+    margin: 0;
+}
+
+
+/* --- NEW MODAL STYLES --- */
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    color: #333;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.modal-content h2 {
+    margin-bottom: 1.5rem;
+}
+
+.close-btn {
+    color: #aaa;
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+}
+
+/* History List Styles */
+#historyList {
+    list-style-type: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#historyList li {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+#historyList li p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+#historyList li strong {
+    color: #333;
+}

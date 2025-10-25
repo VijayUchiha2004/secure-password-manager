@@ -1,0 +1,394 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="container">
+        <h1>Password Manager</h1>
+        
+       
+        <div class="search-filter">
+            <div class="input-box">
+                <input type="text" id="searchInput" placeholder="Search passwords...">
+                <i class='bx bx-search'></i>
+            </div>
+            <select id="categoryFilter" title="Filter by Category">
+                <option value="">All Categories</option>
+                <option value="social">Social Media</option>
+                <option value="email">Email</option>
+                <option value="banking">Banking</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <div class="add-password-form">
+            <h2>Add New Password</h2>
+            <form id="addPasswordForm">
+                <div class="input-box">
+                    <input type="text" id="website" placeholder="Website" required>
+                    <i class='bx bx-globe'></i>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="username" placeholder="Username" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="password" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt'></i>
+                    <i class='bx bx-show toggle-password'></i>
+                    <div class="password-strength"></div>
+                </div>
+                <div class="password-options">
+                    <button type="button" id="generatePassword" class="btn-secondary">Generate Password</button>
+                    <label for="passwordLength" class="visually-hidden">Password Length</label>
+                    <select id="passwordLength" title="Password Length">
+                        <option value="12">12 characters</option>
+                        <option value="16" selected>16 characters</option>
+                        <option value="20">20 characters</option>
+                        <option value="24">24 characters</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <select id="category" required title="Category">
+                        <option value="">Select Category</option>
+                        <option value="social">Social Media</option>
+                        <option value="email">Email</option>
+                        <option value="banking">Banking</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <textarea id="notes" placeholder="Notes (optional)"></textarea>
+                </div>
+                <button type="submit" class="btn">Add Password</button>
+            </form>
+        </div>
+
+        <div class="passwords-list">
+            <h2>Saved Passwords</h2>
+            <div id="passwordsList"></div>
+        </div>
+        <button id="logoutBtn" class="btn">Logout</button>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            window.location.href = 'login.html';
+        }
+
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/)) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+            return strength;
+        }
+
+        // Update password strength indicator
+        document.getElementById('password').addEventListener('input', function(e) {
+            const strength = checkPasswordStrength(e.target.value);
+            const strengthBar = document.querySelector('.password-strength');
+            strengthBar.className = 'password-strength';
+            if (strength > 0) strengthBar.classList.add(`strength-${strength}`);
+        });
+
+        // Toggle password visibility
+        document.querySelector('.toggle-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('bx-show');
+            this.classList.toggle('bx-hide');
+        });
+
+        // Generate password
+        document.getElementById('generatePassword').addEventListener('click', async function() {
+            const length = document.getElementById('passwordLength').value;
+            try {
+                const response = await fetch(`http://localhost:3000/generate-password?length=${length}`);
+                const data = await response.json();
+                document.getElementById('password').value = data.password;
+                checkPasswordStrength(data.password);
+            } catch (error) {
+                console.error('Error generating password:', error);
+            }
+        });
+
+        // Copy to clipboard function
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        // Fetch and display passwords
+        async function loadPasswords() {
+            try {
+                const response = await fetch(`http://localhost:3000/passwords/${userId}`);
+                const passwords = await response.json();
+                const passwordsList = document.getElementById('passwordsList');
+                passwordsList.innerHTML = '';
+
+                passwords.forEach(pwd => {
+                    const div = document.createElement('div');
+                    div.className = 'password-item';
+                    div.innerHTML = `
+                        <div class="password-info">
+                            <strong>${pwd.website}</strong>
+                            <p>Username: ${pwd.username}</p>
+                            <p class="password-field">
+                                Password: <span class="password-dots">${'•'.repeat(pwd.password.length)}</span>
+                                <span class="password-text" style="display: none;">${pwd.password}</span>
+                                <i class='bx bx-copy copy-btn'></i>
+                                <i class='bx bx-show toggle-view'></i>
+                            </p>
+                            <p class="category">Category: ${pwd.category || 'Uncategorized'}</p>
+                            ${pwd.notes ? `<p class="notes">Notes: ${pwd.notes}</p>` : ''}
+                            <p class="date">Last updated: ${new Date(pwd.updated_at).toLocaleString()}</p>
+                        </div>
+                        <button class="delete-btn" data-website="${pwd.website}">Delete</button>
+                    `;
+                    passwordsList.appendChild(div);
+
+                    // Add copy functionality
+                    const copyBtn = div.querySelector('.copy-btn');
+                    copyBtn.addEventListener('click', () => copyToClipboard(pwd.password));
+
+                    // Add toggle view functionality
+                    const toggleBtn = div.querySelector('.toggle-view');
+                    const dotsSpan = div.querySelector('.password-dots');
+                    const textSpan = div.querySelector('.password-text');
+                    toggleBtn.addEventListener('click', () => {
+                        const isHidden = dotsSpan.style.display !== 'none';
+                        dotsSpan.style.display = isHidden ? 'none' : 'inline';
+                        textSpan.style.display = isHidden ? 'inline' : 'none';
+                        toggleBtn.classList.toggle('bx-show');
+                        toggleBtn.classList.toggle('bx-hide');
+                    });
+                });
+
+                // Add delete event listeners
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const website = btn.dataset.website;
+                        if (confirm('Are you sure you want to delete this password?')) {
+                            try {
+                                const response = await fetch(`http://localhost:3000/passwords/${userId}/${website}`, {
+                                    method: 'DELETE'
+                                });
+                                if (response.ok) {
+                                    loadPasswords();
+                                }
+                            } catch (error) {
+                                console.error('Error deleting password:', error);
+                            }
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('Error loading passwords:', error);
+            }
+        }
+
+        // Search and filter functionality
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+
+        function filterPasswords() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const category = categoryFilter.value;
+            const items = document.querySelectorAll('.password-item');
+
+            items.forEach(item => {
+                const website = item.querySelector('strong').textContent.toLowerCase();
+                const itemCategory = item.querySelector('.category').textContent.split(': ')[1];
+                const matchesSearch = website.includes(searchTerm);
+                const matchesCategory = !category || itemCategory === category;
+                item.style.display = matchesSearch && matchesCategory ? 'flex' : 'none';
+            });
+        }
+
+        searchInput.addEventListener('input', filterPasswords);
+        categoryFilter.addEventListener('change', filterPasswords);
+
+        // Add new password
+        document.getElementById('addPasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const website = document.getElementById('website').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const category = document.getElementById('category').value;
+            const notes = document.getElementById('notes').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/passwords', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId, website, username, password, category, notes })
+                });
+
+                if (response.ok) {
+                    this.reset();
+                    loadPasswords();
+                }
+            } catch (error) {
+                console.error('Error adding password:', error);
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('userId');
+            window.location.href = 'login.html';
+        });
+
+        // Initial load
+        loadPasswords();
+    </script>
+</body>
+</html>  -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="container">
+        <h1>Password Manager</h1>
+        
+        <div class="search-filter">
+            <div class="input-box">
+                <input type="text" id="searchInput" placeholder="Search by website...">
+                <i class='bx bx-search'></i>
+            </div>
+            <select id="categoryFilter" class="input-box" title="Filter by Category" aria-label="Filter by Category">
+                <option value="">All Categories</option>
+                <option value="social">Social Media</option>
+                <option value="email">Email</option>
+                <option value="banking">Banking</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <div class="add-password-form">
+            <h2>Add New Password</h2>
+            <form id="addPasswordForm">
+                <div class="input-box">
+                    <input type="text" id="website" placeholder="Website" required>
+                    <i class='bx bx-globe'></i>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="username" placeholder="Username" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="password" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt'></i>
+                    <i class='bx bx-show toggle-password'></i>
+                </div>
+                <div class="password-strength"></div>
+                <div class="password-options">
+                    <button type="button" id="generatePassword" class="btn-secondary">Generate Password</button>
+                    <select id="passwordLength" class="input-box" title="Password Length" aria-label="Password Length">
+                        <option value="12">12 characters</option>
+                        <option value="16" selected>16 characters</option>
+                        <option value="20">20 characters</option>
+                        <option value="24">24 characters</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <select id="category" required title="Category" aria-label="Category">
+                        <option value="">Select Category</option>
+                        <option value="social">Social Media</option>
+                        <option value="email">Email</option>
+                        <option value="banking">Banking</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <textarea id="notes" placeholder="Notes (optional)"></textarea>
+                </div>
+                <button type="submit" class="btn">Add Password</button>
+            </form>
+        </div>
+
+        <div class="passwords-list">
+            <h2>Saved Passwords</h2>
+            <div id="passwordsList">
+                </div>
+        </div>
+        <button id="logoutBtn" class="btn">Logout</button>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Edit Password</h2>
+            <form id="editPasswordForm">
+                <input type="hidden" id="editPasswordId">
+                <div class="input-box">
+                    <input type="text" id="editWebsite" placeholder="Website" required>
+                    <i class='bx bx-globe'></i>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="editUsername" placeholder="Username" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="editPassword" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt'></i>
+                    <i class='bx bx-show toggle-password'></i>
+                </div>
+                <div class="password-strength"></div>
+                <div class="input-box">
+                    <select id="editCategory" required title="Category" aria-label="Category">
+                        <option value="">Select Category</option>
+                        <option value="social">Social Media</option>
+                        <option value="email">Email</option>
+                        <option value="banking">Banking</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <textarea id="editNotes" placeholder="Notes (optional)"></textarea>
+                </div>
+                <button type="submit" class="btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Password History</h2>
+            <ul id="historyList">
+                </ul>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
+
+
+ 
