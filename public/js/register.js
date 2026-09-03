@@ -9,8 +9,9 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         const csrfToken = document.cookie.split('; ')
             .find(cookie => cookie.startsWith('csrf_token='))
             ?.split('=')[1];
-        const response = await fetch('/register', {
+        const response = await fetch(apiUrl('/register'), {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': csrfToken
@@ -21,7 +22,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         const result = await response.json();
         if (result.success) {
             alert('Registration successful! You can now log in.');
-            window.location.href = '/login'; // Redirect to login page
+            window.location.href = '/login.html'; // Redirect to login page
         } else {
             alert('Registration failed: ' + result.message);
         }

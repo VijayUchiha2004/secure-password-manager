@@ -311,11 +311,11 @@ async function fetchWithAuth(url, options = {}) {
         headers['Content-Type'] = 'application/json';
     }
     
-    const response = await fetch(url, { ...options, headers, credentials: 'same-origin' });
+    const response = await fetch(apiUrl(url), { ...options, headers, credentials: 'include' });
 
     if (response.status === 401 || response.status === 403) {
         // Token is invalid or expired
-        window.location.href = '/login';
+        window.location.href = '/login.html';
         return null; // Stop execution
     }
     return response;
@@ -351,7 +351,7 @@ async function deletePassword(id) {
 async function generatePassword() {
     const length = document.getElementById('passwordLength').value;
     try {
-        const response = await fetch(`/generate-password?length=${length}`);
+        const response = await fetch(apiUrl(`/generate-password?length=${length}`));
         const data = await response.json();
         const passwordInput = document.getElementById('password');
         const strengthBar = document.querySelector('.add-password-form .password-strength');
@@ -567,12 +567,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const csrfToken = document.cookie.split('; ')
             .find(cookie => cookie.startsWith('csrf_token='))
             ?.split('=')[1];
-        await fetch('/logout', {
+        await fetch(apiUrl('/logout'), {
             method: 'POST',
-            credentials: 'same-origin',
+            credentials: 'include',
             headers: { 'X-CSRF-Token': csrfToken }
         });
-        window.location.href = '/login';
+        window.location.href = '/login.html';
     });
 
     // Add Password form

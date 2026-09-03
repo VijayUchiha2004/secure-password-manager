@@ -54,7 +54,7 @@ app.use((req, res, next) => {
     next();
 });
 if (process.env.CORS_ORIGIN) {
-    app.use(cors({ origin: process.env.CORS_ORIGIN }));
+    app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
 }
 
 // Serve static files from 'public' directory

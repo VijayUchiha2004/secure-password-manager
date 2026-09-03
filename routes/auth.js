@@ -12,7 +12,7 @@ const { validateAuthInput } = require('../middleware/validateInput');
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: process.env.CORS_ORIGIN ? 'none' : 'strict',
     maxAge: 60 * 60 * 1000,
     path: '/'
 };
