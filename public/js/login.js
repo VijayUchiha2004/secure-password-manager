@@ -9,8 +9,9 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         const csrfToken = document.cookie.split('; ')
             .find(cookie => cookie.startsWith('csrf_token='))
             ?.split('=')[1];
-        const response = await fetch('/login', {
+        const response = await fetch(apiUrl('/login'), {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': csrfToken
@@ -20,7 +21,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
         const result = await response.json();
         if (result.success) {
-            window.location.href = '/main'; // Redirect to main page
+            window.location.href = '/main.html'; // Redirect to main page
         } else {
             alert('Login failed: ' + result.message);
         }

@@ -4,7 +4,7 @@ const logger = require('../utils/logger');
 const csrfCookieOptions = {
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: process.env.CORS_ORIGIN ? 'none' : 'strict',
     maxAge: 60 * 60 * 1000,
     path: '/'
 };
