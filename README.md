@@ -105,6 +105,9 @@ The server listens on `PORT` (default `3000`) and binds to `HOST` (default
   Set `DB_PORT` to the provider port and `DB_SSL=true` when TLS is required.
   For Aiven, use port `23688` and provide its CA certificate in `DB_SSL_CA`
   when certificate verification is not covered by the host's trust store.
+  The Render blueprint temporarily sets `DB_SSL_REJECT_UNAUTHORIZED=false`
+  because Aiven's certificate chain is not trusted by the default Render
+  runtime; restore verification after adding Aiven's CA certificate.
 * Set secrets through the host's secret manager; never commit `.env`.
 * Serve the application behind HTTPS and a reverse proxy/load balancer.
   The app redirects production HTTP requests to HTTPS and enables HSTS.
