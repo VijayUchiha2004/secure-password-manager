@@ -33,4 +33,4 @@ services:
       - key: ENCRYPTION_KEY
         sync: false
       - key: CORS_ORIGIN
-        sync: false
+        value: https://secure-mypassword-manager.netlify.app
