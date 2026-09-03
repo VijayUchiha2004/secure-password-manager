@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const logger = require('../utils/logger');
+require('dotenv').config();
 
 const csrfCookieOptions = {
     httpOnly: false,
@@ -10,17 +11,29 @@ const csrfCookieOptions = {
 };
 
 function csrfMiddleware(req, res, next) {
-    const csrfToken = req.cookies.csrf_token || crypto.randomBytes(32).toString('hex');
+    const timestamp = Math.floor(Date.now() / 1000);
+    const csrfToken = `${timestamp}.${crypto
+        .createHmac('sha256', process.env.JWT_SECRET)
+        .update(String(timestamp))
+        .digest('hex')}`;
     req.csrfToken = csrfToken;
-    if (!req.cookies.csrf_token) {
-        res.cookie('csrf_token', csrfToken, csrfCookieOptions);
-    }
+    res.cookie('csrf_token', csrfToken, csrfCookieOptions);
 
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-        const csrfCookie = req.cookies.csrf_token;
         const csrfHeader = req.get('X-CSRF-Token');
-        if (!csrfCookie || !csrfHeader || csrfCookie.length !== csrfHeader.length ||
-            !crypto.timingSafeEqual(Buffer.from(csrfCookie), Buffer.from(csrfHeader))) {
+        const [timestampValue, signature] = csrfHeader ? csrfHeader.split('.') : [];
+        const expectedSignature = timestampValue
+            ? crypto.createHmac('sha256', process.env.JWT_SECRET)
+                .update(timestampValue)
+                .digest('hex')
+            : '';
+        const tokenAge = Number.parseInt(timestampValue, 10);
+        const validToken = Number.isInteger(tokenAge)
+            && Math.abs(Math.floor(Date.now() / 1000) - tokenAge) <= 3600
+            && signature
+            && signature.length === expectedSignature.length
+            && crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
+        if (!validToken) {
             logger.warn('CSRF validation failed', {
                 ip: req.ip,
                 method: req.method,
