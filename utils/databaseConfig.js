@@ -16,12 +16,16 @@ const getDatabaseOptions = () => {
     };
 
     if (process.env.DB_SSL === 'true') {
+        const caCertificate = process.env.DB_SSL_CA
+            ? process.env.DB_SSL_CA.replace(/\\n/g, '\n')
+            : undefined;
         options.ssl = {
-            rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false'
+            rejectUnauthorized: Boolean(caCertificate)
+                && process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false'
         };
 
-        if (process.env.DB_SSL_CA) {
-            options.ssl.ca = process.env.DB_SSL_CA.replace(/\\n/g, '\n');
+        if (caCertificate) {
+            options.ssl.ca = caCertificate;
         }
     }
 
