@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://secure-mypassword-manager-api.onrender.com';
+const API_BASE_URL = '';
 
 function apiUrl(path) {
     return `${API_BASE_URL}${path}`;
