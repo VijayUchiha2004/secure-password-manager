@@ -6,17 +6,20 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     const password = document.getElementById('password').value;
 
     try {
-        const response = await fetch('http://localhost:3000/login', {
+        const csrfToken = document.cookie.split('; ')
+            .find(cookie => cookie.startsWith('csrf_token='))
+            ?.split('=')[1];
+        const response = await fetch('/login', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
             },
             body: JSON.stringify({ username, password })
         });
 
         const result = await response.json();
         if (result.success) {
-            localStorage.setItem('token', result.token); 
             window.location.href = '/main'; // Redirect to main page
         } else {
             alert('Login failed: ' + result.message);

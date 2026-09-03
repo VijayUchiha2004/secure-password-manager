@@ -259,11 +259,8 @@
 
 // File: public/js/main.js
 
-// Check for token on load
-const token = localStorage.getItem('token');
-if (!token) {
-    window.location.href = '/login';
-}
+// Authentication is handled by the HttpOnly access_token cookie.
+const token = null;
 
 // Global variable to store passwords
 let allPasswords = [];
@@ -302,19 +299,22 @@ function copyToClipboard(text) {
 
 // --- API FUNCTIONS ---
 async function fetchWithAuth(url, options = {}) {
+    const csrfToken = document.cookie.split('; ')
+        .find(cookie => cookie.startsWith('csrf_token='))
+        ?.split('=')[1];
     const headers = {
         ...options.headers,
         'Authorization': `Bearer ${token}`
     };
+    headers['X-CSRF-Token'] = csrfToken;
     if (options.body) {
         headers['Content-Type'] = 'application/json';
     }
     
-    const response = await fetch(url, { ...options, headers });
+    const response = await fetch(url, { ...options, headers, credentials: 'same-origin' });
 
     if (response.status === 401 || response.status === 403) {
         // Token is invalid or expired
-        localStorage.removeItem('token');
         window.location.href = '/login';
         return null; // Stop execution
     }
@@ -323,7 +323,7 @@ async function fetchWithAuth(url, options = {}) {
 
 async function loadPasswords() {
     try {
-        const response = await fetchWithAuth(`http://localhost:3000/passwords`);
+        const response = await fetchWithAuth('/passwords');
         if (!response) return;
 
         allPasswords = await response.json();
@@ -336,7 +336,7 @@ async function loadPasswords() {
 async function deletePassword(id) {
     if (confirm('Are you sure you want to delete this password?')) {
         try {
-            const response = await fetchWithAuth(`http://localhost:3000/passwords/${id}`, {
+            const response = await fetchWithAuth(`/passwords/${id}`, {
                 method: 'DELETE'
             });
             if (response && response.ok) {
@@ -351,7 +351,7 @@ async function deletePassword(id) {
 async function generatePassword() {
     const length = document.getElementById('passwordLength').value;
     try {
-        const response = await fetch(`http://localhost:3000/generate-password?length=${length}`);
+        const response = await fetch(`/generate-password?length=${length}`);
         const data = await response.json();
         const passwordInput = document.getElementById('password');
         const strengthBar = document.querySelector('.add-password-form .password-strength');
@@ -377,33 +377,82 @@ function renderPasswords(passwords) {
     });
 
     if (filteredPasswords.length === 0) {
-        passwordsList.innerHTML = '<p style="color: #666; text-align: center;">No passwords found.</p>';
+        const emptyMessage = document.createElement('p');
+        emptyMessage.style.cssText = 'color: #666; text-align: center;';
+        emptyMessage.textContent = 'No passwords found.';
+        passwordsList.appendChild(emptyMessage);
         return;
     }
 
     filteredPasswords.forEach(pwd => {
         const div = document.createElement('div');
         div.className = 'password-item';
-        div.innerHTML = `
-            <div class="password-info">
-                <strong>${pwd.website}</strong>
-                <p>Username: ${pwd.username}</p>
-                <p class="password-field">
-                    Password: <span class="password-dots">${'•'.repeat(pwd.password.length)}</span>
-                    <span class="password-text" style="display: none;">${pwd.password}</span>
-                    <i class='bx bx-copy copy-btn'></i>
-                    <i class='bx bx-show toggle-view'></i>
-                </p>
-                <p>Category: ${pwd.category || 'Uncategorized'}</p>
-                ${pwd.notes ? `<p>Notes: ${pwd.notes}</p>` : ''}
-                <p style="font-size: 12px; color: #999;">Last updated: ${new Date(pwd.updated_at).toLocaleString()}</p>
-            </div>
-            <div class="password-actions">
-                <button class="btn-secondary edit-btn" data-id="${pwd.id}">Edit</button>
-                <button class="btn-secondary history-btn" data-id="${pwd.id}">History</button>
-                <button class="delete-btn" data-id="${pwd.id}">Delete</button>
-            </div>
-        `;
+
+        const info = document.createElement('div');
+        info.className = 'password-info';
+
+        const website = document.createElement('strong');
+        website.textContent = pwd.website;
+        info.appendChild(website);
+
+        const username = document.createElement('p');
+        username.textContent = `Username: ${pwd.username}`;
+        info.appendChild(username);
+
+        const passwordField = document.createElement('p');
+        passwordField.className = 'password-field';
+        passwordField.append('Password: ');
+
+        const passwordDots = document.createElement('span');
+        passwordDots.className = 'password-dots';
+        passwordDots.textContent = '•'.repeat(pwd.password.length);
+        passwordField.appendChild(passwordDots);
+
+        const passwordText = document.createElement('span');
+        passwordText.className = 'password-text';
+        passwordText.style.display = 'none';
+        passwordText.textContent = pwd.password;
+        passwordField.appendChild(passwordText);
+
+        const copyButton = document.createElement('i');
+        copyButton.className = 'bx bx-copy copy-btn';
+        passwordField.appendChild(copyButton);
+
+        const toggleButton = document.createElement('i');
+        toggleButton.className = 'bx bx-show toggle-view';
+        passwordField.appendChild(toggleButton);
+        info.appendChild(passwordField);
+
+        const category = document.createElement('p');
+        category.textContent = `Category: ${pwd.category || 'Uncategorized'}`;
+        info.appendChild(category);
+
+        if (pwd.notes) {
+            const notes = document.createElement('p');
+            notes.textContent = `Notes: ${pwd.notes}`;
+            info.appendChild(notes);
+        }
+
+        const updated = document.createElement('p');
+        updated.style.cssText = 'font-size: 12px; color: #999;';
+        updated.textContent = `Last updated: ${new Date(pwd.updated_at).toLocaleString()}`;
+        info.appendChild(updated);
+        div.appendChild(info);
+
+        const actions = document.createElement('div');
+        actions.className = 'password-actions';
+        [
+            ['Edit', 'btn-secondary edit-btn'],
+            ['History', 'btn-secondary history-btn'],
+            ['Delete', 'delete-btn']
+        ].forEach(([label, className]) => {
+            const button = document.createElement('button');
+            button.className = className;
+            button.dataset.id = pwd.id;
+            button.textContent = label;
+            actions.appendChild(button);
+        });
+        div.appendChild(actions);
         passwordsList.appendChild(div);
     });
 
@@ -473,32 +522,33 @@ function openEditModal(id) {
 
 async function openHistoryModal(id) {
     const historyList = document.getElementById('historyList');
-    historyList.innerHTML = '<p>Loading history...</p>';
+    historyList.textContent = 'Loading history...';
     historyModal.style.display = 'block';
 
     try {
-        const response = await fetchWithAuth(`http://localhost:3000/passwords/${id}/history`);
+        const response = await fetchWithAuth(`/passwords/${id}/history`);
         if (!response) return;
 
         const history = await response.json();
         
         if (history.length === 0) {
-            historyList.innerHTML = '<p>No password history found.</p>';
+            historyList.textContent = 'No password history found.';
             return;
         }
 
         historyList.innerHTML = '';
         history.forEach(hist => {
             const li = document.createElement('li');
-            li.innerHTML = `
-                <p><strong>Password:</strong> ${'•'.repeat(hist.password.length)}</p>
-                <p><strong>Changed:</strong> ${new Date(hist.changed_at).toLocaleString()}</p>
-            `;
+            const password = document.createElement('p');
+            password.textContent = `Password: ${'•'.repeat(hist.password.length)}`;
+            const changed = document.createElement('p');
+            changed.textContent = `Changed: ${new Date(hist.changed_at).toLocaleString()}`;
+            li.append(password, changed);
             historyList.appendChild(li);
         });
     } catch (error) {
         console.error('Error fetching history:', error);
-        historyList.innerHTML = '<p>Error loading history.</p>';
+        historyList.textContent = 'Error loading history.';
     }
 }
 
@@ -513,8 +563,15 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPasswords();
 
     // Logout
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        localStorage.removeItem('token');
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        const csrfToken = document.cookie.split('; ')
+            .find(cookie => cookie.startsWith('csrf_token='))
+            ?.split('=')[1];
+        await fetch('/logout', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'X-CSRF-Token': csrfToken }
+        });
         window.location.href = '/login';
     });
 
@@ -530,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetchWithAuth('http://localhost:3000/passwords', {
+            const response = await fetchWithAuth('/passwords', {
                 method: 'POST',
                 body: JSON.stringify(formData)
             });
@@ -561,7 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetchWithAuth(`http://localhost:3000/passwords/${id}`, {
+            const response = await fetchWithAuth(`/passwords/${id}`, {
                 method: 'PUT',
                 body: JSON.stringify(formData)
             });
