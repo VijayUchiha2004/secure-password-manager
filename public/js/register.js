@@ -6,9 +6,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     const password = document.getElementById('password').value;
 
     try {
-        const csrfToken = document.cookie.split('; ')
-            .find(cookie => cookie.startsWith('csrf_token='))
-            ?.split('=')[1];
+        const csrfToken = await getCsrfToken();
         const response = await fetch(apiUrl('/register'), {
             method: 'POST',
             credentials: 'include',

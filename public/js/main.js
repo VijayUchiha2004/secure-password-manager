@@ -299,9 +299,7 @@ function copyToClipboard(text) {
 
 // --- API FUNCTIONS ---
 async function fetchWithAuth(url, options = {}) {
-    const csrfToken = document.cookie.split('; ')
-        .find(cookie => cookie.startsWith('csrf_token='))
-        ?.split('=')[1];
+    const csrfToken = await getCsrfToken();
     const headers = {
         ...options.headers,
         'Authorization': `Bearer ${token}`
@@ -564,9 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', async () => {
-        const csrfToken = document.cookie.split('; ')
-            .find(cookie => cookie.startsWith('csrf_token='))
-            ?.split('=')[1];
+        const csrfToken = await getCsrfToken();
         await fetch(apiUrl('/logout'), {
             method: 'POST',
             credentials: 'include',

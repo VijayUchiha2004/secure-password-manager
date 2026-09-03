@@ -32,6 +32,9 @@ app.disable('x-powered-by');
 app.use(express.json({ limit: '25kb' }));
 app.use(cookieParser());
 app.use(requestLogger);
+if (process.env.CORS_ORIGIN) {
+    app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
+}
 app.use(csrfMiddleware);
 app.use((req, res, next) => {
     if (process.env.NODE_ENV === 'production' && req.get('X-Forwarded-Proto') !== 'https') {
@@ -43,7 +46,7 @@ app.use((req, res, next) => {
     res.setHeader(
         'Content-Security-Policy',
         "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://unpkg.com; " +
-        "font-src 'self' https://fonts.gstatic.com https://unpkg.com; img-src 'self' data:; connect-src 'self'; " +
+        `font-src 'self' https://fonts.gstatic.com https://unpkg.com; img-src 'self' data:; connect-src 'self' ${process.env.CORS_ORIGIN || ''}; ` +
         "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
     );
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
@@ -53,10 +56,9 @@ app.use((req, res, next) => {
     }
     next();
 });
-if (process.env.CORS_ORIGIN) {
-    app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
-}
-
+app.get('/csrf-token', (req, res) => {
+    res.json({ csrfToken: req.csrfToken });
+});
 // Serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 

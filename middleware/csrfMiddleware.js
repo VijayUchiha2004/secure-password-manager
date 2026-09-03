@@ -10,8 +10,10 @@ const csrfCookieOptions = {
 };
 
 function csrfMiddleware(req, res, next) {
+    const csrfToken = req.cookies.csrf_token || crypto.randomBytes(32).toString('hex');
+    req.csrfToken = csrfToken;
     if (!req.cookies.csrf_token) {
-        res.cookie('csrf_token', crypto.randomBytes(32).toString('hex'), csrfCookieOptions);
+        res.cookie('csrf_token', csrfToken, csrfCookieOptions);
     }
 
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
