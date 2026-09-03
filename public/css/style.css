@@ -656,3 +656,239 @@ body {
 #historyList li strong {
     color: #333;
 }
+
+/* Modern security dashboard theme */
+:root {
+    --ink: #e8eef7;
+    --muted: #8d9bb2;
+    --surface: rgba(17, 27, 47, 0.88);
+    --surface-soft: rgba(27, 40, 66, 0.72);
+    --border: rgba(148, 163, 184, 0.18);
+    --accent: #6ee7d8;
+    --accent-strong: #36cbb9;
+    --danger: #fb7185;
+}
+
+body {
+    color: var(--ink);
+    background: linear-gradient(rgba(5, 12, 24, 0.74), rgba(5, 12, 24, 0.9)),
+        url('/img.jpg') center / cover fixed no-repeat,
+        radial-gradient(circle at 15% 10%, #243a66 0, transparent 35%),
+        radial-gradient(circle at 85% 90%, #123e4a 0, transparent 38%), #08111f;
+}
+
+.input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.input-box label {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.input-box label span {
+    color: #64748b;
+    font-weight: 400;
+    text-transform: none;
+}
+
+.add-password-form form,
+#editPasswordForm {
+    display: grid;
+    gap: 1rem;
+}
+
+.add-password-form .input-box,
+#editPasswordForm .input-box {
+    margin: 0;
+}
+
+.add-password-form .input-box i,
+#editPasswordForm .input-box i {
+    top: calc(50% + 0.65rem);
+}
+
+.wrapper,
+.container {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+}
+
+.wrapper {
+    border-radius: 24px;
+}
+
+.wrapper h1,
+.container h1 {
+    letter-spacing: -0.04em;
+}
+
+.wrapper h1::before,
+.container h1::before {
+    content: "◈ ";
+    color: var(--accent);
+}
+
+.input-box input,
+.input-box select,
+.input-box textarea,
+.search-filter,
+.password-field {
+    color: var(--ink);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+}
+
+.input-box input::placeholder,
+.input-box textarea::placeholder {
+    color: var(--muted);
+}
+
+.input-box input:focus,
+.input-box select:focus,
+.input-box textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(110, 231, 216, 0.12);
+    background: rgba(31, 49, 79, 0.9);
+}
+
+.input-box i,
+.password-field i {
+    color: var(--muted);
+}
+
+.wrapper .btn,
+.container .btn {
+    color: #06211f;
+    background: linear-gradient(135deg, var(--accent), #9bf6d8);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wrapper .btn:hover,
+.container .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(54, 203, 185, 0.25);
+}
+
+.container {
+    max-width: 980px;
+    border-radius: 28px;
+}
+
+.add-password-form,
+.passwords-list {
+    background: rgba(13, 23, 41, 0.72);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+}
+
+.add-password-form h2,
+.passwords-list h2 {
+    color: var(--ink);
+}
+
+.password-item {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin: 0.75rem 0;
+    padding: 1.25rem;
+    background: rgba(24, 37, 62, 0.62);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.password-item:hover {
+    border-color: rgba(110, 231, 216, 0.45);
+    transform: translateY(-2px);
+}
+
+.password-info strong {
+    color: var(--accent);
+    font-size: 1.05rem;
+}
+
+.password-info p {
+    color: var(--muted);
+}
+
+.btn-secondary {
+    background: #294365;
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: #385b83;
+}
+
+.delete-btn {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid rgba(251, 113, 133, 0.35);
+}
+
+.delete-btn:hover {
+    background: rgba(251, 113, 133, 0.15);
+}
+
+#logoutBtn {
+    width: auto;
+    min-width: 150px;
+}
+
+.modal-content {
+    background: #101c31;
+    color: var(--ink);
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.modal-content h2,
+#historyList li p,
+#historyList li strong {
+    color: var(--ink);
+}
+
+#historyList li {
+    background: var(--surface-soft);
+    border-color: var(--border);
+}
+
+@media (max-width: 640px) {
+    .container {
+        width: calc(100% - 1.5rem);
+        padding: 1rem;
+        margin: 0.75rem auto;
+    }
+
+    .wrapper {
+        width: calc(100% - 1.5rem);
+        padding: 1.5rem;
+    }
+
+    .search-filter,
+    .password-options {
+        flex-direction: column;
+    }
+
+    .search-filter select {
+        width: 100%;
+    }
+
+    .password-item {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .password-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}

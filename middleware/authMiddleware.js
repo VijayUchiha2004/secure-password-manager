@@ -4,22 +4,27 @@
 const jwt = require('jsonwebtoken');
 
 function authenticateToken(req, res, next) {
-    // Get the token from the Authorization header (e.g., "Bearer TOKEN")
+    const cookies = (req.headers.cookie || '').split(';').reduce((values, cookie) => {
+        const separator = cookie.indexOf('=');
+        if (separator > 0) {
+            values[cookie.slice(0, separator).trim()] = decodeURIComponent(cookie.slice(separator + 1));
+        }
+        return values;
+    }, {});
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = cookies.access_token || (authHeader && authHeader.split(' ')[1]);
 
     if (token == null) {
-        return res.sendStatus(401); // No token, unauthorized
+        return res.sendStatus(401);
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) {
-            return res.sendStatus(403); // Invalid token
+            return res.sendStatus(403);
         }
-        
-        // Add the user payload (which contains the user's ID) to the request object
+
         req.user = user;
-        next(); // Proceed to the next middleware or route handler
+        next();
     });
 }
 

@@ -7,17 +7,22 @@ const { encrypt, decrypt } = require('../utils/crypto');
 const authenticateToken = require('../middleware/authMiddleware');
 
 const router = express.Router();
+const crypto = require('crypto');
+const { validatePasswordInput, validatePasswordId } = require('../middleware/validateInput');
 
 // --- UPDATED SECTION ---
 // --- Place UNPROTECTED utility routes at the top ---
 
 // Generate password
 router.get('/generate-password', (req, res) => {
-    const length = parseInt(req.query.length) || 16;
+    const length = Number.parseInt(req.query.length, 10);
+    if (!Number.isInteger(length) || length < 8 || length > 128) {
+        return res.status(400).json({ success: false, message: 'Password length must be between 8 and 128.' });
+    }
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
     let password = "";
     for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * charset.length);
+        const randomIndex = crypto.randomInt(charset.length);
         password += charset[randomIndex];
     }
     res.json({ password });
@@ -26,6 +31,9 @@ router.get('/generate-password', (req, res) => {
 // Check password strength
 router.post('/check-password-strength', (req, res) => {
     const { password } = req.body;
+    if (typeof password !== 'string' || password.length > 1024) {
+        return res.status(400).json({ success: false, message: 'Password must be a string up to 1024 characters.' });
+    }
     let strength = 0;
     let feedback = [];
 
@@ -73,7 +81,7 @@ router.get('/passwords', async (req, res) => {
 });
 
 // POST /passwords - Add a new password
-router.post('/passwords', async (req, res) => {
+router.post('/passwords', validatePasswordInput, async (req, res) => {
     const userId = req.user.id;
     const { website, username, password, category, notes } = req.body; 
     
@@ -95,7 +103,7 @@ router.post('/passwords', async (req, res) => {
 });
 
 // PUT /passwords/:id - Update an existing password
-router.put('/passwords/:id', async (req, res) => {
+router.put('/passwords/:id', validatePasswordId, validatePasswordInput, async (req, res) => {
     const userId = req.user.id;
     const { id } = req.params;
     const { website, username, password, category, notes } = req.body;
@@ -135,7 +143,7 @@ router.put('/passwords/:id', async (req, res) => {
 });
 
 // DELETE /passwords/:id - Delete a password
-router.delete('/passwords/:id', async (req, res) => {
+router.delete('/passwords/:id', validatePasswordId, async (req, res) => {
     const userId = req.user.id;
     const { id } = req.params;
 
@@ -153,7 +161,7 @@ router.delete('/passwords/:id', async (req, res) => {
 });
 
 // GET /passwords/:id/history - Get history for one password
-router.get('/passwords/:id/history', async (req, res) => {
+router.get('/passwords/:id/history', validatePasswordId, async (req, res) => {
     const userId = req.user.id;
     const { id } = req.params;
 

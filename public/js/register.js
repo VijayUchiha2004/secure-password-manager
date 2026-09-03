@@ -6,10 +6,14 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     const password = document.getElementById('password').value;
 
     try {
-        const response = await fetch('http://localhost:3000/register', {
+        const csrfToken = document.cookie.split('; ')
+            .find(cookie => cookie.startsWith('csrf_token='))
+            ?.split('=')[1];
+        const response = await fetch('/register', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
             },
             body: JSON.stringify({ username, password })
         });

@@ -30,15 +30,18 @@
             <h2>Add New Password</h2>
             <form id="addPasswordForm">
                 <div class="input-box">
-                    <input type="text" id="website" placeholder="Website" required>
+                    <label for="website">Website or service</label>
+                    <input type="text" id="website" placeholder="e.g. github.com" autocomplete="url" required>
                     <i class='bx bx-globe'></i>
                 </div>
                 <div class="input-box">
-                    <input type="text" id="username" placeholder="Username" required>
+                    <label for="username">Account username</label>
+                    <input type="text" id="username" placeholder="name@example.com" autocomplete="username" required>
                     <i class='bx bxs-user'></i>
                 </div>
                 <div class="input-box">
-                    <input type="password" id="password" placeholder="Password" required>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter or generate a password" autocomplete="new-password" required>
                     <i class='bx bxs-lock-alt'></i>
                     <i class='bx bx-show toggle-password'></i>
                     <div class="password-strength"></div>
@@ -63,7 +66,8 @@
                     </select>
                 </div>
                 <div class="input-box">
-                    <textarea id="notes" placeholder="Notes (optional)"></textarea>
+                    <label for="notes">Notes <span>(optional)</span></label>
+                    <textarea id="notes" placeholder="Add a secure note or recovery hint"></textarea>
                 </div>
                 <button type="submit" class="btn">Add Password</button>
             </form>
@@ -347,15 +351,18 @@
             <form id="editPasswordForm">
                 <input type="hidden" id="editPasswordId">
                 <div class="input-box">
-                    <input type="text" id="editWebsite" placeholder="Website" required>
+                    <label for="editWebsite">Website or service</label>
+                    <input type="text" id="editWebsite" placeholder="e.g. github.com" required>
                     <i class='bx bx-globe'></i>
                 </div>
                 <div class="input-box">
-                    <input type="text" id="editUsername" placeholder="Username" required>
+                    <label for="editUsername">Account username</label>
+                    <input type="text" id="editUsername" placeholder="name@example.com" required>
                     <i class='bx bxs-user'></i>
                 </div>
                 <div class="input-box">
-                    <input type="password" id="editPassword" placeholder="Password" required>
+                    <label for="editPassword">Password</label>
+                    <input type="password" id="editPassword" placeholder="Enter a password" required>
                     <i class='bx bxs-lock-alt'></i>
                     <i class='bx bx-show toggle-password'></i>
                 </div>
@@ -370,7 +377,8 @@
                     </select>
                 </div>
                 <div class="input-box">
-                    <textarea id="editNotes" placeholder="Notes (optional)"></textarea>
+                    <label for="editNotes">Notes <span>(optional)</span></label>
+                    <textarea id="editNotes" placeholder="Add a secure note or recovery hint"></textarea>
                 </div>
                 <button type="submit" class="btn">Save Changes</button>
             </form>

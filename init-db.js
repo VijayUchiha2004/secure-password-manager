@@ -13,15 +13,10 @@ const connection = mysql.createConnection({
 
 const setupDatabase = async () => {
     try {
-        console.log('Dropping old tables (if they exist)...');
-        await connection.query('DROP TABLE IF EXISTS password_history');
-        await connection.query('DROP TABLE IF EXISTS passwords');
-        await connection.query('DROP TABLE IF EXISTS users');
-
-        console.log('Creating new tables...');
+        console.log('Creating tables if they do not already exist...');
 
         await connection.query(`
-            CREATE TABLE users (
+            CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(255) NOT NULL UNIQUE,
                 password VARCHAR(255) NOT NULL,
@@ -31,7 +26,7 @@ const setupDatabase = async () => {
         console.log('Table "users" created.');
 
         await connection.query(`
-            CREATE TABLE passwords (
+            CREATE TABLE IF NOT EXISTS passwords (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
                 website VARCHAR(255) NOT NULL,
@@ -49,7 +44,7 @@ const setupDatabase = async () => {
         console.log('Table "passwords" created.');
 
         await connection.query(`
-            CREATE TABLE password_history (
+            CREATE TABLE IF NOT EXISTS password_history (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 password_id INT NOT NULL,
                 user_id INT NOT NULL,
@@ -66,6 +61,7 @@ const setupDatabase = async () => {
         await connection.end();
     } catch (err) {
         console.error('Error during database setup:', err);
+        process.exitCode = 1;
         await connection.end();
     }
 };
