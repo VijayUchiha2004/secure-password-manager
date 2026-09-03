@@ -109,3 +109,14 @@ The server listens on `PORT` (default `3000`) and binds to `HOST` (default
 * Keep the frontend and API on the same HTTPS origin so the CSRF and auth cookies remain protected.
 * The server sends a restrictive Content Security Policy; keep frontend scripts external and same-origin.
 * Do not run `init-db.js` automatically on every deployment if schema migrations are introduced.
+
+## Deploying the API to Render
+
+This repository includes a `render.yaml` blueprint for the Express API. In
+Render, create a Blueprint from this repository and set the secret values for
+`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `ENCRYPTION_KEY`, and
+`CORS_ORIGIN`. Use the Aiven MySQL connection details for the database values.
+
+Run `node init-db.js` once locally with the production database variables, or
+run it as a one-off Render shell command before using the application. Never
+commit those values.
