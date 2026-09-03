@@ -8,13 +8,18 @@ require('dotenv').config();
 const algorithm = 'aes-256-gcm';
 const key = process.env.ENCRYPTION_KEY;
 
-if (!key || key.length !== 32) {
-    throw new Error('ENCRYPTION_KEY is missing or not 32 characters long. Check your .env file.');
+let keyBuffer;
+if (key && /^[0-9a-f]{64}$/i.test(key)) {
+    keyBuffer = Buffer.from(key, 'hex');
+} else if (key && key.length === 32) {
+    keyBuffer = Buffer.from(key);
+} else {
+    throw new Error('ENCRYPTION_KEY must be 64 hexadecimal characters or exactly 32 characters. Check your environment variables.');
 }
 
 function encrypt(text) {
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
+    const cipher = crypto.createCipheriv(algorithm, keyBuffer, iv);
     let encrypted = cipher.update(text);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
     const authTag = cipher.getAuthTag();
@@ -31,7 +36,7 @@ function decrypt(text) {
         const encryptedText = Buffer.from(encryptedHex || authTagHex, 'hex');
         const decipher = crypto.createDecipheriv(
             encryptedHex ? algorithm : 'aes-256-cbc',
-            Buffer.from(key),
+            keyBuffer,
             iv
         );
         if (encryptedHex) {

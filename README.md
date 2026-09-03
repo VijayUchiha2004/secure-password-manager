@@ -102,6 +102,9 @@ The server listens on `PORT` (default `3000`) and binds to `HOST` (default
 ## Production checklist
 
 * Use a managed MySQL instance with TLS, backups, and a least-privilege database user.
+  Set `DB_PORT` to the provider port and `DB_SSL=true` when TLS is required.
+  For Aiven, use port `23688` and provide its CA certificate in `DB_SSL_CA`
+  when certificate verification is not covered by the host's trust store.
 * Set secrets through the host's secret manager; never commit `.env`.
 * Serve the application behind HTTPS and a reverse proxy/load balancer.
   The app redirects production HTTP requests to HTTPS and enables HSTS.
@@ -114,8 +117,11 @@ The server listens on `PORT` (default `3000`) and binds to `HOST` (default
 
 This repository includes a `render.yaml` blueprint for the Express API. In
 Render, create a Blueprint from this repository and set the secret values for
-`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `ENCRYPTION_KEY`, and
-`CORS_ORIGIN`. Use the Aiven MySQL connection details for the database values.
+`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSL`,
+`DB_SSL_REJECT_UNAUTHORIZED`, `DB_SSL_CA`, `ENCRYPTION_KEY`, and `CORS_ORIGIN`.
+Use the Aiven MySQL connection details for the database values. Set `DB_PORT`
+to `23688`, `DB_SSL` to `true`, and paste the Aiven CA certificate into
+`DB_SSL_CA` if required by the connection test.
 
 Run `node init-db.js` once locally with the production database variables, or
 run it as a one-off Render shell command before using the application. Never
